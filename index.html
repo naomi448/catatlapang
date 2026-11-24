@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CatatLapang — Field notes that stay on your device</title>
+<link rel="stylesheet" href="css/styles.css">
+<!--
+  Firebase JS SDK pinned at 12.5.0 (competition floor: >= 12.5.0 for
+  on-device web inference via Firebase AI Logic). Loaded as ES modules
+  straight from Google's CDN so the project stays a pure static site —
+  no build step, no node_modules.
+-->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js",
+    "firebase/ai": "https://www.gstatic.com/firebasejs/12.5.0/firebase-ai.js",
+    "firebase/app-check": "https://www.gstatic.com/firebasejs/12.5.0/firebase-app-check.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>CatatLapang</h1>
+    <p class="tagline">Field notes that stay on your device</p>
+  </div>
+  <div class="pills">
+    <span id="nano-pill" class="pill pill-unknown" title="Gemini Nano availability in this browser (Chrome Prompt API)">On-device: checking…</span>
+    <span id="net-pill" class="pill" title="Connection state">…</span>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- LEFT: note list + editor -->
+  <section class="col col-left">
+    <div class="card">
+      <div class="card-head">
+        <h2>Today's notes</h2>
+        <button id="btn-new" class="btn btn-small">+ New note</button>
+      </div>
+      <ul id="note-list" class="note-list"></ul>
+      <p id="note-list-empty" class="muted">No notes yet. Write your first field note below, or load the fictional sample notes.</p>
+      <button id="btn-samples" class="btn btn-ghost btn-small">Load sample notes (fictional)</button>
+    </div>
+
+    <div class="card">
+      <h2>Note editor</h2>
+      <label class="field-label" for="note-title">Title / household (optional)</label>
+      <input id="note-title" type="text" placeholder="e.g. Bu Sari — balita check">
+      <label class="field-label" for="note-text">Rough field note (Indonesian or English, shorthand is fine)</label>
+      <textarea id="note-text" rows="8" placeholder="tulis catatan lapangan apa adanya di sini…"></textarea>
+      <div class="row">
+        <button id="btn-save" class="btn">Save note</button>
+        <button id="btn-ringkas" class="btn btn-primary">Ringkas di perangkat<br><small>Summarize on-device</small></button>
+        <button id="btn-delete" class="btn btn-danger btn-small" hidden>Delete note</button>
+      </div>
+      <p id="save-status" class="muted small">All notes are stored only in this browser (IndexedDB). Nothing is uploaded unless you tap a cloud action.</p>
+    </div>
+  </section>
+
+  <!-- RIGHT: summary + week + report -->
+  <section class="col col-right">
+    <div class="card">
+      <div class="card-head">
+        <h2>Summary</h2>
+        <span id="summary-badge" class="badge" hidden></span>
+      </div>
+      <div id="summary-body">
+        <p class="muted">Select a note and tap <strong>Ringkas di perangkat</strong>. The clean-up and summary run on this device with Gemini Nano — the raw note never leaves it.</p>
+      </div>
+      <div id="summary-progress" class="progress-wrap" hidden>
+        <div class="progress-bar"><div id="summary-progress-fill"></div></div>
+        <p id="summary-progress-text" class="muted small">Preparing on-device model…</p>
+      </div>
+      <div id="cloud-fallback-box" class="notice" hidden>
+        <p>On-device summarization isn't available on this device right now, so the raw note has <strong>not</strong> been sent anywhere. If you want, you can explicitly summarize this one note in the cloud instead.</p>
+        <button id="btn-ringkas-cloud" class="btn btn-small">Summarize in cloud instead</button>
+        <p id="cloud-fallback-note" class="muted small"></p>
+      </div>
+      <div class="row">
+        <label class="field-label inline" for="translate-lang">Translate summary to</label>
+        <select id="translate-lang">
+          <option value="English">English</option>
+          <option value="Indonesian">Indonesian</option>
+        </select>
+        <button id="btn-translate" class="btn" disabled>Terjemahkan / Translate</button>
+      </div>
+      <div id="translation-box" hidden>
+        <div class="card-head">
+          <h3>Translation</h3>
+          <span id="translation-badge" class="badge" hidden></span>
+        </div>
+        <p id="translation-text"></p>
+      </div>
+      <label class="reviewed-row">
+        <input type="checkbox" id="chk-reviewed" disabled>
+        <span>Sudah saya tinjau — I have reviewed this summary (only reviewed summaries go into the weekly report)</span>
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>This week</h2>
+      <p id="week-strip" class="week-strip">—</p>
+      <button id="btn-report" class="btn btn-primary">Buat laporan mingguan<br><small>Generate weekly report (cloud)</small></button>
+      <p class="muted small">Built only from summaries you marked as reviewed. Sent to the cloud model only when you tap this button.</p>
+    </div>
+
+    <div class="card" id="report-card" hidden>
+      <div class="card-head">
+        <h2>Weekly report</h2>
+        <span id="report-badge" class="badge badge-cloud" hidden></span>
+      </div>
+      <div id="report-body" class="report-body"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span id="storage-status">Storage: IndexedDB (this device only)</span>
+  <span class="muted">· CatatLapang — #BuildHybridAI 2026 · Hybrid inference via Firebase AI Logic: Gemini Nano on-device + Gemini in the cloud</span>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
