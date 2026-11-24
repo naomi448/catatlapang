@@ -124,3 +124,15 @@ on-device Prompt API, dan kode Firebase AI Logic dengan config placeholder.
 - Yan replaced the pack with the fixed build, hard-reloaded, tapped Buat laporan mingguan: SUCCESS. Weekly report rendered with the "Cloud - Gemini" badge, built only from the 1 reviewed summary (Pak Darto), with all 4 designed sections (Visits by day / Key observations / Supplies & issues / Follow-up list).
 - End-to-end proof complete: Gemini Nano on-device summarize (Prompt API) + Firebase AI Logic cloud report (ONLY_IN_CLOUD, gemini-3.5-flash-lite via inCloudParams) with App Check enforced (Fraud Defense provider + registered debug token) on the Spark plan, $0.
 - Remaining for the entry: public GitHub repo, hosted URL, demo video (<=3 min, public YouTube), Devpost submission by 1 Dec 05:00 WIB; feature freeze 28 Nov.
+
+## Public repo published (2026-11-24 ~11:02 WIB)
+- Yan created the empty public repo naomi448/catatlapang himself (on his laptop) and added it to the fine-grained token scope. Published via the GitHub API (Contents bootstrap + Git Data tree): 11 files (app + README + LICENSE Apache-2.0 + BUILDLOG). Bootstrap commit 9564b37, publish commit 0b91828; recursive tree verified MATCH against the local source.
+- Secret scan before publish: only the public-by-design Firebase web config + App Check site key; no secrets.
+- GitHub Pages enablement via API failed (403, token lacks Pages permission) — Yan must flip it in repo Settings > Pages (branch main, / root). Hosted URL will be https://naomi448.github.io/catatlapang/ — for cloud features to work there, the reCAPTCHA Enterprise key also needs the naomi448.github.io domain added.
+
+## Hosted URL live (2026-11-24 ~11:05 WIB)
+- Yan enabled GitHub Pages himself (Settings > Pages: Deploy from a branch, main / root). Verified from the VM: https://naomi448.github.io/catatlapang/ returns HTTP 200 with the app title; js/css assets serve 200.
+- Remaining nicety: add domain naomi448.github.io to the reCAPTCHA Enterprise key so App Check attestation (and thus cloud features) also works on the public URL; on-device features work there regardless.
+
+## App Check debug provider gated to localhost (2026-11-24 ~11:10 WIB)
+- Found while preparing the public-URL check: js/firebase-ai.js set self.FIREBASE_APPCHECK_DEBUG_TOKEN = true unconditionally, which forces the debug provider for EVERY visitor — on the public GitHub Pages URL every cloud call would 403 with an unregistered debug token. Fixed: the flag is now set only when location.hostname is localhost/127.0.0.1; public visitors get real reCAPTCHA Enterprise attestation (the key's domain list now includes naomi448.github.io, added by Yan in bare-domain form after a first attempt with an https:// prefix was corrected). Yan's laptop flow is unchanged.

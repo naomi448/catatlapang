@@ -14,12 +14,16 @@
 //       It is NEVER used silently: the privacy path is on-device or
 //       nothing, unless the worker taps that button themselves.
 //
-// App Check: AI Logic enforces App Check. For local development we use
+// App Check: AI Logic enforces App Check. On localhost only, we use
 // the DEBUG provider: setting self.FIREBASE_APPCHECK_DEBUG_TOKEN = true
 // before initializeAppCheck makes the SDK print a debug token in the
-// browser console; Yan registers that token in Firebase console ->
-// Security -> App Check -> Apps -> Manage debug tokens. The token value
-// itself is never stored in this repo.
+// browser console; that token is registered in Firebase console ->
+// App Check -> Apps -> Manage debug tokens. The token value itself is
+// never stored in this repo. On any other host (e.g. the public GitHub
+// Pages deployment) the flag stays OFF so real visitors get genuine
+// reCAPTCHA Enterprise attestation — forcing the debug provider there
+// would make every visitor's cloud call fail with an unregistered
+// token. (Localhost-only gating fixed 2026-11-24.)
 //
 // Until js/firebase-config.js is filled in with Yan's project config,
 // initFirebase() returns null and every function here reports
@@ -61,9 +65,12 @@ export function initFirebase() {
 
   const app = initializeApp(firebaseConfig);
 
-  // --- App Check (debug provider for local development) -------------------
-  // Must be set BEFORE initializeAppCheck runs.
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  // --- App Check -----------------------------------------------------------
+  // Debug provider ONLY on localhost (see header note). Must be set
+  // BEFORE initializeAppCheck runs.
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
   try {
     if (isAppCheckSiteKeyConfigured()) {
       initializeAppCheck(app, {
